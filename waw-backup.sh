@@ -122,21 +122,28 @@ if [[ ! -r $what ]]; then
 							echo "Backup will proceed!"
 							count=0
 								while read LINE; do
+								if [[ $LINE != "" ]]; then
+								
 								((count++))
 								echo
 								echo -n "$count. "
 									what_read=$LINE
 									where_printout="yes"	
-										
+									copy=
+
 										if [[ -e $what_read ]]; then
 											if [[ -d $what_read ]]; then
 												echo "copy (d) $what_read to :"
-								
+												copy="dir"
+
 											elif [[ -r $what_read ]]; then
 												echo "copy (-) $what_read to :"
+												copy="file"
 
 											elif [[ -L $what_read ]]; then
 												echo "copy (l) $what_read to :"
+												copy="file"
+
 
 											else
 												echo "Unknown file/folder!"
@@ -154,11 +161,18 @@ if [[ ! -r $what ]]; then
 									echo
 										
 									while read LINE; do
+									if [[ $LINE != "" ]]; then
 										where_read=$LINE
 											if [[ -e $where_read ]]; then
 												if [[ -d $where_read ]]; then
 													echo -n "$where_read"
-													copy_dir
+													if [[ $copy == "dir" ]]; then
+														copy_dir
+													
+													else
+														copy_file
+													
+													fi
 
 												else
 													echo "$where_read is not folder"
@@ -169,10 +183,12 @@ if [[ ! -r $what ]]; then
 												echo "$where_read doesn't exist!"
 												
 											fi
+									fi
 									done < <(cat $where)
 									
 									fi
 								
+								fi
 								done < <(cat $what)
 
 							until_loop="no"
