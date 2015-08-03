@@ -23,21 +23,23 @@ If you want to proceed backup use argument -b
 
 This code is first idea and that is why version is 0.0.1
 
-# Sample Simulation
+# Simulation
 ```bash
 Simulation Backup will proceed!
 
-1. copy (d) /home/test/Documents/ to : #from what.txt file (d) mean directory
-
+WHAT 1. dir 
+/home/test/Documents/ #from what.txt file, dir mean directory
+WHERE
 /home/test/Sync/ #from where.txt file
 /home/test/Desktop/
 /home/test/Documents/
 /folder1 doesn't exist!
 /folder two doesn't exist!
-/home/test/tput_test.sh is not folder #not folder so can't backup there
+/home/test/tput_test.sh is not folder #not folder so you can't backup there
 
-2. copy (-) /home/test/Sync/Sync/pineapples_final2.png to : #(-) mean regular file
-
+WHAT 2. file #file mean regular file
+/home/test/Sync/Sync/pineapples_final2.png
+WHERE
 /home/test/Sync/
 /home/test/Desktop/
 /home/test/Documents/
@@ -45,23 +47,25 @@ Simulation Backup will proceed!
 /something doesn't exist!
 /home/test/tput_test.sh is not folder
 
-3. /home/test/test_folder/something doesn't exist!
+WHAT 3. /home/test/test_folder/something doesn't exist!
 
-4. /home/find_me doesn't exist!
+WHAT 4. /home/find_me doesn't exist!
 ```
 
-# Sample Backup
+# Backup
 ```bash
 Are you sure to proceed backup? Try argument -t first. (Yy/Nn) : y
 Backup will proceed!
 
-1. copy (-) /home/test/dnt-ver.9/additional_functions.sh to :
-
+WHAT 1. file
+/home/test/dnt-ver.9/additional_functions.sh
+WHERE
 /home/test_folder/test doesn't exist!
 /home/test/test_two > file copied!
 
-2. copy (d) /home/test/dnt-ver.9/dialog_tcpdump-rpm to :
-
+WHAT 2. dir
+/home/test/dnt-ver.9/dialog_tcpdump-rpm
+WHERE
 /home/test_folder/test doesn't exist!
 /home/test/test_two > dir copied!
 ```
