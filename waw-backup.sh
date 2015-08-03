@@ -205,14 +205,7 @@ if [[ ! -r $what ]]; then
 }
 
 #SCRIPT START############################################################
-#if config file exist load it else use default options
-if [[ -e waw_backup.conf ]]; then
-	. waw_backup.conf
-
-else
-	default_config
-
-fi
+default_config
 
 ####################################
 #show program usage if no argument given
@@ -240,13 +233,19 @@ until [[ -z "$1" && $usage == "hide_usage" ]]; do
 			echo "what to backup in $what :"
 			echo
 			while read LINE; do
-				echo "     $LINE"
+				if [[ -n $LINE ]]; then
+					echo "     $LINE"
+					
+				fi
 			done < <(cat $what)
 			echo
 			echo "where to backup in $where :"
 			echo 
 			while read LINE; do
-				echo "     $LINE"
+				if [[ -n $LINE ]]; then
+					echo "     $LINE"
+					
+				fi
 			done < <(cat $where)
 			exit
 			;;
