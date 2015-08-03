@@ -21,8 +21,6 @@ If you want to proceed backup use argument -b
 ./waw-backup.sh -b
 ```
 
-This code is first idea and that is why version is 0.0.1
-
 # Simulation
 ```bash
 Simulation Backup will proceed!
