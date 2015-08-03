@@ -1,6 +1,6 @@
 #!/bin/bash
 #waw-backup
-waw_backup_version="0.0.1"
+waw_backup_version="1.0.0"
 
 #default configuration
 function default_config()
@@ -27,7 +27,7 @@ function config()
 		echo "Path to file/folder you want to backup (no input = continue)"
 		what_entry="proceed"
 		until [[ -z $what_entry ]]; do	
-			read -e -p "what > " what_entry
+			read -e -p "WHAT > " what_entry
 				if [[ -n $what_entry ]]; then
 					echo $what_entry >> $what
 				
@@ -40,7 +40,7 @@ function config()
 		echo "Path to folder, where you want to create your backups (no input = continue)"
 		where_entry="proceed"
 		until [[ -z $where_entry ]]; do		
-			read -e -p "where > " where_entry
+			read -e -p "WHERE > " where_entry
 				if [[ -n $where_entry ]]; then
 					echo $where_entry >> $where
 				
@@ -126,22 +126,25 @@ if [[ ! -r $what ]]; then
 								
 								((count++))
 								echo
-								echo -n "$count. "
+								echo -n "WHAT $count. "
 									what_read=$LINE
 									where_printout="yes"	
 									copy=
 
 										if [[ -e $what_read ]]; then
 											if [[ -d $what_read ]]; then
-												echo "copy (d) $what_read to :"
+												echo "dir"
+												echo "$what_read"
 												copy="dir"
 
 											elif [[ -r $what_read ]]; then
-												echo "copy (-) $what_read to :"
+												echo "file"
+												echo "$what_read"
 												copy="file"
 
 											elif [[ -L $what_read ]]; then
-												echo "copy (l) $what_read to :"
+												echo "link"
+												echo "$what_read"
 												copy="file"
 
 
@@ -158,21 +161,20 @@ if [[ ! -r $what ]]; then
 										fi
 
 									if [[ $where_printout == "yes" ]]; then
-									echo
-										
+									echo "WHERE"	
 									while read LINE; do
 									if [[ $LINE != "" ]]; then
 										where_read=$LINE
 											if [[ -e $where_read ]]; then
 												if [[ -d $where_read ]]; then
 													echo -n "$where_read"
-													if [[ $copy == "dir" ]]; then
-														copy_dir
-													
-													else
-														copy_file
-													
-													fi
+														if [[ $copy == "dir" ]]; then
+															copy_dir
+														
+														else
+															copy_file
+														
+														fi
 
 												else
 													echo "$where_read is not folder"
@@ -234,7 +236,7 @@ until [[ -z "$1" && $usage == "hide_usage" ]]; do
 			echo
 			while read LINE; do
 				if [[ -n $LINE ]]; then
-					echo "     $LINE"
+					echo "$LINE"
 					
 				fi
 			done < <(cat $what)
@@ -243,7 +245,7 @@ until [[ -z "$1" && $usage == "hide_usage" ]]; do
 			echo 
 			while read LINE; do
 				if [[ -n $LINE ]]; then
-					echo "     $LINE"
+					echo "$LINE"
 					
 				fi
 			done < <(cat $where)
