@@ -1,4 +1,4 @@
-# waw-backup 0.0.1
+# waw-backup 1.0.0
 What and Where Backup. Easy as possible backup, with file what.txt (what to backup) and where.txt (where to backup).
 
 what.txt mean paths to directories/files what you want to backup.
