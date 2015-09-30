@@ -4,7 +4,19 @@ What and Where Backup. Easy as possible backup, with file what.txt (what to back
 what.txt mean paths to directories/files what you want to backup.
 where.txt mean paths to directories where paths from what.txt will be copied.
 
-# How to?!
+# Usage and how to
+waw_backup5 [ARGUMENTS]
+       -b   | proceed backup
+       -c   | configure entries in $what and $where files
+       -m   | try create nonexisting folders (use with -t or -b)
+       -p   | prompt if you want to copy specified path
+       -s   | show what and where files
+       -t   | test files and folders, emulated backup
+
+what = What to backup; where = Where to backup
+Example: waw-backup -ty #test files and folders and create unexist (where) dirs
+	     waw-backup -by #proceed backup and create where dirs, if don't exist
+
 ```bash
 sudo chmod +x waw-backup.sh
 ./waw-backup.sh

@@ -14,10 +14,10 @@ function usage()
 	echo "Usage: $0 [ARGUMENTS]"
 	echo "       -b   | proceed backup"
 	echo "       -c   | configure entries in $what and $where files"
+	echo "       -m   | try create nonexisting folders (use with -t or -b)"
 	echo "       -p   | prompt if you want to copy specified path"
 	echo "       -s   | show what and where files"
 	echo "       -t   | test files and folders, emulated backup"
-	echo "       -m   | try create nonexisting folders (use with -t or -b)"
 	echo
 	echo "what = What to backup; where = Where to backup"
 	echo "Example: waw-backup -ty #test files and folders and create unexist (where) dirs"
