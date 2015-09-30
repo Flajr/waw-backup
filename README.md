@@ -5,6 +5,7 @@ what.txt mean paths to directories/files what you want to backup.
 where.txt mean paths to directories where paths from what.txt will be copied.
 
 # Usage and how to
+```bash
 waw_backup5 [ARGUMENTS]
        -b   | proceed backup
        -c   | configure entries in $what and $where files
@@ -16,7 +17,7 @@ waw_backup5 [ARGUMENTS]
 what = What to backup; where = Where to backup
 Example: waw-backup -ty #test files and folders and create unexist (where) dirs
 	     waw-backup -by #proceed backup and create where dirs, if don't exist
-
+```
 ```bash
 sudo chmod +x waw-backup.sh
 ./waw-backup.sh
