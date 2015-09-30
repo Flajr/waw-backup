@@ -5,23 +5,23 @@ if [[ $(id -u) -eq 0 ]]; then
 	exit
 fi
 
-waw_backup_version="4.0.0"
+waw_backup_version="5.0.0"
 
 function usage()
 {
-	echo "waw-backup version $waw_backup_version"
+	echo "$0 version $waw_backup_version"
 	echo
-	echo "Usage: waw-backup [ARGUMENTS]"
+	echo "Usage: $0 [ARGUMENTS]"
 	echo "       -b   | proceed backup"
 	echo "       -c   | configure entries in $what and $where files"
+	echo "       -p   | prompt if you want to copy specified path"
 	echo "       -s   | show what and where files"
 	echo "       -t   | test files and folders, emulated backup"
-	echo "       -y   | try create folders which do not exist (if is argument alone program use -yt instead)"
-	echo "what = What to backup; where = Where to backup"
+	echo "       -m   | try create nonexisting folders (use with -t or -b)"
 	echo
+	echo "what = What to backup; where = Where to backup"
 	echo "Example: waw-backup -ty #test files and folders and create unexist (where) dirs"
 	echo "         waw-backup -by #proceed backup and create where dirs, if don't exist"
-	usage="hide_usage"
 	exit
 }
 
@@ -34,13 +34,11 @@ function default_config()
 	if [[ ! -e $what ]]; then
 		touch $what
 		echo "Dumped $what !"
-	
 	fi
 
 	if [[ ! -e $where ]]; then
 		touch $where
 		echo "Dumped $where !"
-	
 	fi
 }
 
@@ -52,17 +50,14 @@ function config()
 		while read line; do
 			if [[ -z $line ]]; then
 				continue
-				
 			else
 				echo "WHAT > $line"
-				
 			fi
 		done < <(cat $what |awk '{print $1}')
 		until [[ -z $what_entry ]]; do	
 			read -e -p "WHAT > " what_entry
 				if [[ -n $what_entry ]]; then
 					echo $what_entry >> $what
-				
 				fi
 		
 		done
@@ -74,31 +69,38 @@ function config()
 		while read line; do
 			if [[ -z $line ]]; then
 				continue
-
 			else
 				echo "WHERE > $line"
-
 			fi
 		done< <(cat $where |awk '{print $1}')
 		until [[ -z $where_entry ]]; do		
 			read -e -p "WHERE > " where_entry
 				if [[ -n $where_entry ]]; then
 					echo $where_entry >> $where
-				
 				fi
-		
 		done
 
 		echo -ne "\033[F\033[K"
-	
+		exit
 }
 
 function copy_dir()
 {
-	if [[ $simulation == "yes" ]]; then
+	local var
+	printf "$printf_var"
+	if [[ $simulation -eq 1 ]]; then
 		echo
-	
 	else	
+		if [[ $prompt_copy -eq 1 ]]; then
+			read -p " Copy? (Yy/Nn)" var
+			if [[ $var =~ Y|y ]]; then
+				printf "\033[F\033[K$printf_var"
+			elif [[ $var =~ N|n ]]; then
+				printf "\033[F\033[K$printf_var\n"
+				return 0
+			fi
+		fi
+
 		printf " [COPYING]"
 		cp -R -- "$what_read" "$where_read" 2>> log_file.txt
 		local exit_status=$?
@@ -107,17 +109,27 @@ function copy_dir()
 				printf " [OK]\n"
 			else
 				printf " [ERROR] [$exit_status]\n"
-			
 			fi
 	fi
 }
 
 function copy_file()
 {
-	if [[ $simulation == "yes" ]]; then
+	local var
+	printf "$printf_var"
+	if [[ $simulation -eq 1 ]]; then
 		echo
-	
 	else
+		if [[ $prompt_copy -eq 1 ]]; then
+			read -p " Copy? (Yy/Nn)" var
+			if [[ $var =~ Y|y ]]; then
+				printf "\033[F\033[K$printf_var"
+			elif [[ $var =~ N|n ]]; then
+				printf "\033[F\033[K$printf_var\n"
+				return 0
+			fi
+		fi
+		
 		printf " [COPYING]"
 		cp -- "$what_read" "$where_read" 2>> log_file.txt
 		local exit_status=$?
@@ -126,18 +138,34 @@ function copy_file()
 				printf " [OK]\n"
 			else
 				printf " [ERROR] [$exit_status]\n"
-			
 			fi
 	fi
+}
+
+function show_waw()
+{
+	echo "what to backup in $what :"
+	echo
+	while read LINE; do
+		if [[ -n $LINE ]]; then
+			echo "$LINE"
+		fi
+	done < <(cat $what |awk '{print $1}')
+	echo
+	echo "where to backup in $where :"
+	echo 
+	while read LINE; do
+		if [[ -n $LINE ]]; then
+			echo "$LINE"
+		fi
+	done < <(cat $where |awk '{print $1}')
+	exit
 }
 
 function backup()
 {
 	local prompt until_loop_where="yes" until_loop 
-		if [[ ! -v prompt_where ]]; then
-			prompt_where="n" #default, do not create dirs
-		
-		fi
+
 
 	if [[ ! -r $what ]]; then
 		echo "No $what file found, or is unreadable"
@@ -146,8 +174,6 @@ function backup()
 	elif [[ -z $(cat $what) ]]; then
 		echo "No paths defined in $what file"
 		exit 2 #no paths specified
-
-
 	fi
 
 	if [[ ! -r $where ]]; then
@@ -161,17 +187,14 @@ function backup()
 		echo "Will use default ~/waw-backup-d"
 		echo ~/"waw-backup-d" > /tmp/temp-where-file.txt #use file because of while reading from file
 		where="/tmp/temp-where-file.txt"
-
 	fi
 
 	until [[ $until_loop == "no" ]]; do
-		if [[ $simulation == "yes" ]]; then
+		if [[ $simulation -eq 1 ]]; then
 			echo "Just Simulation"
 			prompt="y"
-
 		else
 			read -p "Are you sure to proceed backup? Try argument -t first. (Yy/Nn) : " prompt
-			
 		fi
 
 			
@@ -181,7 +204,7 @@ function backup()
 				fi
 
 				count=0
-				while read LINE; do
+				for LINE in `cat $where |awk '{print $1}'`; do
 				if [[ -z $LINE ]]; then
 					continue
 
@@ -190,10 +213,8 @@ function backup()
 						if [[ -e $where_read ]]; then
 							if [[ -d $where_read ]]; then
 								where_read_status[$count]=1 #is dir
-
 							else
 								where_read_status[$count]=2 #is not dir
-
 							fi
 
 						where_read_var[$count]="$where_read"
@@ -201,36 +222,31 @@ function backup()
 
 						else
 							while [[ $until_loop_where == "yes" ]]; do
-									if [[ $prompt_where == "y" ]]; then
+									if [[ $create_folder -eq 1 ]]; then
 										mkdir "$where_read"
 											if [[ $? -ne 0 ]]; then
 												where_read_status[$count]=3 #can't create folder
-											
 											else
 												where_read_status[$count]=4 #created folder
-
 											fi
 
 										until_loop_where="no"
 
-									elif [[ $prompt_where == "n" ]]; then
+									else
 										where_read_status[$count]=5 #if doesn't exist, do not create
 										until_loop_where="no"
-
 									fi
-								
 							done
 
 							where_read_var[$count]="$where_read"
 							let count++
 							until_loop_where="yes"
-
 						fi
 				fi
-				done < <(cat $where |awk '{print $1}')
+				done
 
 				let count--
-				while read LINE; do
+				for LINE in `cat $what |awk '{print $1}'`; do
 				if [[ -z $LINE ]]; then
 					continue
 
@@ -245,26 +261,20 @@ function backup()
 						if [[ -d $what_read ]]; then
 							printf " [DIR]\n"
 							copy="dir"
-
 						elif [[ -L $what_read ]]; then
 							printf " [LINK]\n"
 							copy="file"
-
 						elif [[ -r $what_read ]]; then
 							printf " [FILE]\n"
 							copy="file"
-
-
 						else
 							echo "Unknown file/folder!"
 							where_printout="no"
-
 						fi
 					
 					else
 						echo "$what_read doesn't exist! [WHAT]"
 						where_printout="no"
-
 					fi
 					
 					if [[ $where_printout == "yes" ]]; then
@@ -274,7 +284,7 @@ function backup()
 								case ${where_read_status[$i]} in
 									
 									1)
-										printf "$where_read [WHERE]" #do not new line [COPYING
+										printf_var="$where_read [WHERE]" #do not new line [COPYING
 											if [[ $copy == "dir" ]]; then
 												copy_dir
 											
@@ -290,13 +300,11 @@ function backup()
 										printf "$where_read [WHERE] can't be create\n"
 									;;
 									4)
-										printf "$where_read [WHERE] [CREATED]"
+										printf_var="$where_read [WHERE] [CREATED]"
 											if [[ $copy == "dir" ]]; then
 												copy_dir
-											
 											else
 												copy_file
-											
 											fi
 									;;
 									5)
@@ -306,21 +314,16 @@ function backup()
 										printf "${where_read_status[$i]} [WHERE] [ERROR]\n"	
 									;;
 								esac
-
 						done
-					
 					fi
-				
 				fi
-				done < <(cat $what |awk '{print $1}')
+				done
 
 				until_loop="no"
 			elif [[ $prompt =~ N|n ]]; then
 				until_loop="no"
 			else
 				until_loop="yes"
-			
-			
 			fi
 	
 			if [[ -s log_file.txt ]]; then
@@ -336,71 +339,48 @@ default_config
 ####################################
 #show program usage if no argument given
 if [[ $# -eq 0 ]]; then
-	usage="show"
-
-else
-	usage="hide_usage"
-
+	usage
 fi
 
-until [[ -z $1 && $usage == "hide_usage" ]]; do
-	case $1 in
-		-c) #run config-menu
-			config
-			exit
-			;;
+while getopts :bcmstp opt; do
+	case $opt in
+		
+		b) #just proceed backup
+			backup_var=1
+		;;
+		
+		c) #run config-menu
+			config_var=1
+		;;
+		
+		s)
+			show_waw_var=1
+		;;
 
-		-b) #just proceed backup
-			backup
-			exit		
-			;;
-		-by|yb)
-			prompt_where="y"
-			backup
-			exit
-			;;
+		t)
+			simulation=1
+			backup_var=1
+		;;
+		
+		p)
+			prompt_copy=1
+		;;
 
-		-s)
-			echo "what to backup in $what :"
-			echo
-			while read -r LINE; do
-				if [[ -n $LINE ]]; then
-					echo "$LINE"
-					
-				fi
-			done < <(cat $what |awk '{print $1}')
-			echo
-			echo "where to backup in $where :"
-			echo 
-			while read LINE; do
-				if [[ -n $LINE ]]; then
-					echo "$LINE"
-					
-				fi
-			done < <(cat $where |awk '{print $1}')
-			exit
-			;;
-
-		-t)
-			simulation="yes"
-			backup
-			exit
-			;;
-
-		-ty|-yt|-y)
-			simulation="yes"
-			prompt_where="y"
-			backup
-			exit
-			;;
+		m)
+			create_folder=1
+		;;
 
 		*)
+			echo "INVALID OPTION: $OPTARG"
 			usage
-			;;
-
-	
+		;;
 	esac
-	 
-	shift
-
 done
+
+if [[ $config_var -eq 1 ]]; then
+	config
+elif [[ $backup_var -eq 1 || $simulation ]]; then
+	backup
+elif [[ $show_waw_var -eq 1 ]]; then
+	show_waw
+fi
