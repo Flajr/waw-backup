@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #waw-backup
 if [[ $(id -u) -eq 0 ]]; then
-	echo "At this state of program, DO NOT RUN AS ROOT!"
+	printf "%s\n" "At this state of program, DO NOT RUN AS ROOT!"
 	exit
 fi
 
@@ -9,19 +9,19 @@ waw_backup_version="5.0.0"
 
 function usage()
 {
-	echo "$0 version $waw_backup_version"
-	echo
-	echo "Usage: $0 [ARGUMENTS]"
-	echo "       -b   | proceed backup"
-	echo "       -c   | configure entries in $what and $where files"
-	echo "       -m   | try create nonexisting folders (use with -t or -b)"
-	echo "       -p   | prompt if you want to copy specified path"
-	echo "       -s   | show what and where files"
-	echo "       -t   | test files and folders, emulated backup"
-	echo
-	echo "what = What to backup; where = Where to backup"
-	echo "Example: waw-backup -ty #test files and folders and create unexist (where) dirs"
-	echo "         waw-backup -by #proceed backup and create where dirs, if don't exist"
+	printf "%s\n" "$0 version $waw_backup_version"
+	printf "\n"
+	printf "%s\n" "Usage: $0 [ARGUMENTS]"
+	printf "%s\n" "       -b   | proceed backup"
+	printf "%s\n" "       -c   | configure entries in $what and $where files"
+	printf "%s\n" "       -m   | try create nonexisting folders (use with -t or -b)"
+	printf "%s\n" "       -p   | prompt if you want to copy specified path"
+	printf "%s\n" "       -s   | show what and where files"
+	printf "%s\n" "       -t   | test files and folders, emulated backup"
+	printf "\n"
+	printf "%s\n" "what = What to backup; where = Where to backup"
+	printf "%s\n" "Example: waw-backup -ty #test files and folders and create unexist (where) dirs"
+	printf "%s\n" "         waw-backup -by #proceed backup and create where dirs, if don't exist"
 	exit
 }
 
@@ -33,54 +33,54 @@ function default_config()
 
 	if [[ ! -e $what ]]; then
 		touch $what
-		echo "Dumped $what !"
+		printf "%s\n" "Dumped $what !"
 	fi
 
 	if [[ ! -e $where ]]; then
 		touch $where
-		echo "Dumped $where !"
+		printf "%s\n" "Dumped $where !"
 	fi
 }
 
 #add entries to what and where files
 function config()
 {
-		echo "Path to file/folder you want to backup (no input = continue)"
+		printf "%s\n" "Path to file/folder you want to backup (no input = continue)"
 		what_entry="proceed"
 		while read line; do
 			if [[ -z $line ]]; then
 				continue
 			else
-				echo "WHAT > $line"
+				printf "%s\n" "WHAT > $line"
 			fi
 		done < <(cat $what |awk '{print $1}')
 		until [[ -z $what_entry ]]; do
 			read -e -p "WHAT > " what_entry
 				if [[ -n $what_entry ]]; then
-					echo $what_entry >> $what
+					printf "%s\n" $what_entry >> $what
 				fi
 
 		done
 
-		echo -ne "\033[F\033[K"
-		echo
-		echo "Path to folder, where you want to create your backups (no input = continue)"
+		printf "%s" "\033[F\033[K"
+		printf "\n"
+		printf "%s\n" "Path to folder, where you want to create your backups (no input = continue)"
 		where_entry="proceed"
 		while read line; do
 			if [[ -z $line ]]; then
 				continue
 			else
-				echo "WHERE > $line"
+				printf "%s\n" "WHERE > $line"
 			fi
 		done< <(cat $where |awk '{print $1}')
 		until [[ -z $where_entry ]]; do
 			read -e -p "WHERE > " where_entry
 				if [[ -n $where_entry ]]; then
-					echo $where_entry >> $where
+					printf "%s\n" $where_entry >> $where
 				fi
 		done
 
-		echo -ne "\033[F\033[K"
+		printf "%s" "\033[F\033[K"
 		exit
 }
 
@@ -89,7 +89,7 @@ function copy_dir()
 	local var
 	printf "$printf_var"
 	if [[ $simulation -eq 1 ]]; then
-		echo
+		printf "\n"
 	else
 		if [[ $prompt_copy -eq 1 ]]; then
 			read -p " Copy? (Yy/Nn)" var
@@ -118,7 +118,7 @@ function copy_file()
 	local var
 	printf "$printf_var"
 	if [[ $simulation -eq 1 ]]; then
-		echo
+		printf "\n"
 	else
 		if [[ $prompt_copy -eq 1 ]]; then
 			read -p " Copy? (Yy/Nn)" var
@@ -144,19 +144,19 @@ function copy_file()
 
 function show_waw()
 {
-	echo "what to backup in $what :"
-	echo
+	printf "%s\n" "what to backup in $what :"
+	printf "\n"
 	while read LINE; do
 		if [[ -n $LINE ]]; then
-			echo "$LINE"
+			printf "%s\n" "$LINE"
 		fi
 	done < <(cat $what |awk '{print $1}')
-	echo
-	echo "where to backup in $where :"
-	echo
+	printf "\n"
+	printf "%s\n" "where to backup in $where :"
+	printf "\n"
 	while read LINE; do
 		if [[ -n $LINE ]]; then
-			echo "$LINE"
+			printf "%s\n" "$LINE"
 		fi
 	done < <(cat $where |awk '{print $1}')
 	exit
@@ -168,30 +168,30 @@ function backup()
 
 
 	if [[ ! -r $what ]]; then
-		echo "No $what file found, or is unreadable"
+		printf "%s\n" "No $what file found, or is unreadable"
 		exit 1 #no file found, or unreadable
 
 	elif [[ -z $(cat $what) ]]; then
-		echo "No paths defined in $what file"
+		printf "%s\n" "No paths defined in $what file"
 		exit 2 #no paths specified
 	fi
 
 	if [[ ! -r $where ]]; then
-		echo "No $where file found, or is unreadable"
-		echo "Will use default ~/waw-backup-d"
-		echo ~/"waw-backup-d" > /tmp/temp-where-file.txt #use file because of while reading from file
+		printf "%s\n" "No $where file found, or is unreadable"
+		printf "%s\n" "Will use default ~/waw-backup-d"
+		printf "%s\n" ~/"waw-backup-d" > /tmp/temp-where-file.txt #use file because of while reading from file
 		where="/tmp/temp-where-file.txt"
 
 	elif [[ -z $(cat $where) ]]; then
-		echo "No paths defined in $where file"
-		echo "Will use default ~/waw-backup-d"
-		echo ~/"waw-backup-d" > /tmp/temp-where-file.txt #use file because of while reading from file
+		printf "%s\n" "No paths defined in $where file"
+		printf "%s\n" "Will use default ~/waw-backup-d"
+		printf "%s\n" ~/"waw-backup-d" > /tmp/temp-where-file.txt #use file because of while reading from file
 		where="/tmp/temp-where-file.txt"
 	fi
 
 	until [[ $until_loop == "no" ]]; do
 		if [[ $simulation -eq 1 ]]; then
-			echo "Just Simulation"
+			printf "%s\n" "Just Simulation"
 			prompt="y"
 		else
 			read -p "Are you sure to proceed backup? Try argument -t first. (Yy/Nn) : " prompt
@@ -251,7 +251,7 @@ function backup()
 					continue
 
 				else
-				echo
+				printf "\n"
 				what_read="$LINE"
 				where_printout="yes"
 				copy=
@@ -268,12 +268,12 @@ function backup()
 							printf " [FILE]\n"
 							copy="file"
 						else
-							echo "Unknown file/folder!"
+							printf "%s\n" "Unknown file/folder!"
 							where_printout="no"
 						fi
 
 					else
-						echo "$what_read doesn't exist! [WHAT]"
+						printf "%s\n" "$what_read doesn't exist! [WHAT]"
 						where_printout="no"
 					fi
 
@@ -371,7 +371,7 @@ while getopts :bcmstp opt; do
 		;;
 
 		*)
-			echo "INVALID OPTION: $OPTARG"
+			printf "%s\n" "INVALID OPTION: $OPTARG"
 			usage
 		;;
 	esac
