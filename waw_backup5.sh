@@ -204,7 +204,7 @@ function backup()
 				fi
 
 				count=0
-				for LINE in `cat $where |awk '{print $1}'`; do
+				for LINE in $(cat $where |awk '{print $1}'); do
 				if [[ -z $LINE ]]; then
 					continue
 
@@ -246,7 +246,7 @@ function backup()
 				done
 
 				let count--
-				for LINE in `cat $what |awk '{print $1}'`; do
+				for LINE in $(cat $what |awk '{print $1}'); do
 				if [[ -z $LINE ]]; then
 					continue
 
@@ -279,7 +279,7 @@ function backup()
 
 					if [[ $where_printout == "yes" ]]; then
 
-						for i in `seq 0 $count`; do
+						for i in $(seq 0 $count); do
 						where_read="${where_read_var[$i]}"
 								case ${where_read_status[$i]} in
 
