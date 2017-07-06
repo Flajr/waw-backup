@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #waw-backup
 if [[ $(id -u) -eq 0 ]]; then
 	echo "At this state of program, DO NOT RUN AS ROOT!"
