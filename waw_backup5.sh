@@ -9,7 +9,7 @@ waw_backup_version="5.0.0"
 
 function usage()
 {
-	printf "%s\n" "$0 version $waw_backup_version"
+	printf "%s\n" "$(basename "$0") version $waw_backup_version"
 	printf "\n"
 	printf "%s\n" "Usage: $0 [ARGUMENTS]"
 	printf "%s\n" "       -b   | proceed backup"
