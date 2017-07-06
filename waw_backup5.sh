@@ -44,7 +44,7 @@ function default_config()
 
 #add entries to what and where files
 function config()
-{ 
+{
 		echo "Path to file/folder you want to backup (no input = continue)"
 		what_entry="proceed"
 		while read line; do
@@ -54,14 +54,14 @@ function config()
 				echo "WHAT > $line"
 			fi
 		done < <(cat $what |awk '{print $1}')
-		until [[ -z $what_entry ]]; do	
+		until [[ -z $what_entry ]]; do
 			read -e -p "WHAT > " what_entry
 				if [[ -n $what_entry ]]; then
 					echo $what_entry >> $what
 				fi
-		
+
 		done
-		
+
 		echo -ne "\033[F\033[K"
 		echo
 		echo "Path to folder, where you want to create your backups (no input = continue)"
@@ -73,7 +73,7 @@ function config()
 				echo "WHERE > $line"
 			fi
 		done< <(cat $where |awk '{print $1}')
-		until [[ -z $where_entry ]]; do		
+		until [[ -z $where_entry ]]; do
 			read -e -p "WHERE > " where_entry
 				if [[ -n $where_entry ]]; then
 					echo $where_entry >> $where
@@ -90,7 +90,7 @@ function copy_dir()
 	printf "$printf_var"
 	if [[ $simulation -eq 1 ]]; then
 		echo
-	else	
+	else
 		if [[ $prompt_copy -eq 1 ]]; then
 			read -p " Copy? (Yy/Nn)" var
 			if [[ $var =~ Y|y ]]; then
@@ -104,7 +104,7 @@ function copy_dir()
 		printf " [COPYING]"
 		cp -R -- "$what_read" "$where_read" 2>> log_file.txt
 		local exit_status=$?
-			
+
 			if [[ $exit_status -eq 0 ]]; then
 				printf " [OK]\n"
 			else
@@ -129,11 +129,11 @@ function copy_file()
 				return 0
 			fi
 		fi
-		
+
 		printf " [COPYING]"
 		cp -- "$what_read" "$where_read" 2>> log_file.txt
 		local exit_status=$?
-			
+
 			if [[ $exit_status -eq 0 ]]; then
 				printf " [OK]\n"
 			else
@@ -153,7 +153,7 @@ function show_waw()
 	done < <(cat $what |awk '{print $1}')
 	echo
 	echo "where to backup in $where :"
-	echo 
+	echo
 	while read LINE; do
 		if [[ -n $LINE ]]; then
 			echo "$LINE"
@@ -164,7 +164,7 @@ function show_waw()
 
 function backup()
 {
-	local prompt until_loop_where="yes" until_loop 
+	local prompt until_loop_where="yes" until_loop
 
 
 	if [[ ! -r $what ]]; then
@@ -197,7 +197,7 @@ function backup()
 			read -p "Are you sure to proceed backup? Try argument -t first. (Yy/Nn) : " prompt
 		fi
 
-			
+
 			if [[ $prompt =~ Y|y ]]; then
 				if [[ -s log_file.txt ]]; then
 					cat /dev/null > log_file.txt
@@ -253,7 +253,7 @@ function backup()
 				else
 				echo
 				what_read="$LINE"
-				where_printout="yes"	
+				where_printout="yes"
 				copy=
 
 					if [[ -e $what_read ]]; then
@@ -271,26 +271,26 @@ function backup()
 							echo "Unknown file/folder!"
 							where_printout="no"
 						fi
-					
+
 					else
 						echo "$what_read doesn't exist! [WHAT]"
 						where_printout="no"
 					fi
-					
+
 					if [[ $where_printout == "yes" ]]; then
-						
+
 						for i in `seq 0 $count`; do
 						where_read="${where_read_var[$i]}"
 								case ${where_read_status[$i]} in
-									
+
 									1)
 										printf_var="$where_read [WHERE]" #do not new line [COPYING
 											if [[ $copy == "dir" ]]; then
 												copy_dir
-											
+
 											else
 												copy_file
-											
+
 											fi
 									;;
 									2)
@@ -311,7 +311,7 @@ function backup()
 										printf "$where_read [WHERE] wasn't created (use -y)\n"
 									;;
 									*)
-										printf "${where_read_status[$i]} [WHERE] [ERROR]\n"	
+										printf "${where_read_status[$i]} [WHERE] [ERROR]\n"
 									;;
 								esac
 						done
@@ -325,7 +325,7 @@ function backup()
 			else
 				until_loop="yes"
 			fi
-	
+
 			if [[ -s log_file.txt ]]; then
 				printf "\nReported errors: \n"
 				cat log_file.txt
@@ -344,15 +344,15 @@ fi
 
 while getopts :bcmstp opt; do
 	case $opt in
-		
+
 		b) #just proceed backup
 			backup_var=1
 		;;
-		
+
 		c) #run config-menu
 			config_var=1
 		;;
-		
+
 		s)
 			show_waw_var=1
 		;;
@@ -361,7 +361,7 @@ while getopts :bcmstp opt; do
 			simulation=1
 			backup_var=1
 		;;
-		
+
 		p)
 			prompt_copy=1
 		;;
