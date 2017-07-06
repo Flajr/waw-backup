@@ -25,7 +25,7 @@ sudo chmod +x waw-backup.sh
 After this command program dumped 2 files in directory (what.txt and where.txt).
 Now you can simple add paths (preferable FULL PATHS) in that files.
 
-Then try use argument -t to see what will be done. 
+Then try use argument -t to see what will be done.
 ```bash
 ./waw-backup.sh -t
 ```
