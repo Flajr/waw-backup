@@ -87,16 +87,16 @@ function config()
 function copy_dir()
 {
 	local var
-	printf "$printf_var"
+	printf "%s" "$printf_var"
 	if [[ $simulation -eq 1 ]]; then
 		printf "\n"
 	else
 		if [[ $prompt_copy -eq 1 ]]; then
 			read -p " Copy? (Yy/Nn)" var
 			if [[ $var =~ Y|y ]]; then
-				printf "\033[F\033[K$printf_var"
+				printf "%s" "\033[F\033[K$printf_var"
 			elif [[ $var =~ N|n ]]; then
-				printf "\033[F\033[K$printf_var\n"
+				printf "%s" "\033[F\033[K$printf_var\n"
 				return 0
 			fi
 		fi
@@ -106,9 +106,9 @@ function copy_dir()
 		local exit_status=$?
 
 			if [[ $exit_status -eq 0 ]]; then
-				printf " [OK]\n"
+				printf "%s\n" " [OK]"
 			else
-				printf " [ERROR] [$exit_status]\n"
+				printf "%s\n" " [ERROR] [$exit_status]"
 			fi
 	fi
 }
@@ -116,28 +116,28 @@ function copy_dir()
 function copy_file()
 {
 	local var
-	printf "$printf_var"
+	printf "%s" "$printf_var"
 	if [[ $simulation -eq 1 ]]; then
 		printf "\n"
 	else
 		if [[ $prompt_copy -eq 1 ]]; then
 			read -p " Copy? (Yy/Nn)" var
 			if [[ $var =~ Y|y ]]; then
-				printf "\033[F\033[K$printf_var"
+				printf "%s" "\033[F\033[K$printf_var"
 			elif [[ $var =~ N|n ]]; then
-				printf "\033[F\033[K$printf_var\n"
+				printf "%s" "\033[F\033[K$printf_var\n"
 				return 0
 			fi
 		fi
 
-		printf " [COPYING]"
+		printf "%s" " [COPYING]"
 		cp -- "$what_read" "$where_read" 2>> log_file.txt
 		local exit_status=$?
 
 			if [[ $exit_status -eq 0 ]]; then
-				printf " [OK]\n"
+				printf "%s\n" " [OK]"
 			else
-				printf " [ERROR] [$exit_status]\n"
+				printf "%s\n" " [ERROR] [$exit_status]"
 			fi
 	fi
 }
@@ -257,15 +257,15 @@ function backup()
 				copy=
 
 					if [[ -e $what_read ]]; then
-					printf "$what_read [WHAT]"
+					printf "%s" "$what_read [WHAT]"
 						if [[ -d $what_read ]]; then
-							printf " [DIR]\n"
+							printf "%s\n" " [DIR]"
 							copy="dir"
 						elif [[ -L $what_read ]]; then
-							printf " [LINK]\n"
+							printf "%s\n" " [LINK]"
 							copy="file"
 						elif [[ -r $what_read ]]; then
-							printf " [FILE]\n"
+							printf "%s\n" " [FILE]"
 							copy="file"
 						else
 							printf "%s\n" "Unknown file/folder!"
@@ -294,10 +294,10 @@ function backup()
 											fi
 									;;
 									2)
-										printf "$where_read [WHERE] is not folder\n"
+										printf "%s\n" "$where_read [WHERE] is not folder"
 									;;
 									3)
-										printf "$where_read [WHERE] can't be create\n"
+										printf "%s\n" "$where_read [WHERE] can't be create"
 									;;
 									4)
 										printf_var="$where_read [WHERE] [CREATED]"
@@ -308,10 +308,10 @@ function backup()
 											fi
 									;;
 									5)
-										printf "$where_read [WHERE] wasn't created (use -y)\n"
+										printf "%s\n" "$where_read [WHERE] wasn't created (use -y)"
 									;;
 									*)
-										printf "${where_read_status[$i]} [WHERE] [ERROR]\n"
+										printf "%s\n" "${where_read_status[$i]} [WHERE] [ERROR]"
 									;;
 								esac
 						done
@@ -327,7 +327,7 @@ function backup()
 			fi
 
 			if [[ -s log_file.txt ]]; then
-				printf "\nReported errors: \n"
+				printf "\n%s\n" "Reported errors:"
 				cat log_file.txt
 			fi
 	done
