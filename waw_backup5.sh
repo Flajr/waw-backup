@@ -47,17 +47,17 @@ function config()
 {
 		printf "%s\n" "Path to file/folder you want to backup (no input = continue)"
 		what_entry="proceed"
-		while read line; do
+		while read -r line; do
 			if [[ -z $line ]]; then
 				continue
 			else
 				printf "%s\n" "WHAT > $line"
 			fi
-		done < <(cat $what |awk '{print $1}')
+		done < <(awk '{print $1}' < "$what")
 		until [[ -z $what_entry ]]; do
-			read -e -p "WHAT > " what_entry
+			read -e -p -r "WHAT > " "$what_entry"
 				if [[ -n $what_entry ]]; then
-					printf "%s\n" $what_entry >> $what
+					printf "%s\n" "$what_entry" >> "$what"
 				fi
 
 		done
@@ -66,17 +66,17 @@ function config()
 		printf "\n"
 		printf "%s\n" "Path to folder, where you want to create your backups (no input = continue)"
 		where_entry="proceed"
-		while read line; do
+		while read -r line; do
 			if [[ -z $line ]]; then
 				continue
 			else
 				printf "%s\n" "WHERE > $line"
 			fi
-		done< <(cat $where |awk '{print $1}')
+		done< <(awk '{print $1}' < "$where")
 		until [[ -z $where_entry ]]; do
-			read -e -p "WHERE > " where_entry
+			read -e -p -r "WHERE > " where_entry
 				if [[ -n $where_entry ]]; then
-					printf "%s\n" $where_entry >> $where
+					printf "%s\n" "$where_entry" >> "$where"
 				fi
 		done
 
@@ -92,7 +92,7 @@ function copy_dir()
 		printf "\n"
 	else
 		if [[ $prompt_copy -eq 1 ]]; then
-			read -p " Copy? (Yy/Nn)" var
+			read -p -r " Copy? (Yy/Nn)" var
 			if [[ $var =~ Y|y ]]; then
 				printf "%s" "\033[F\033[K$printf_var"
 			elif [[ $var =~ N|n ]]; then
@@ -121,7 +121,7 @@ function copy_file()
 		printf "\n"
 	else
 		if [[ $prompt_copy -eq 1 ]]; then
-			read -p " Copy? (Yy/Nn)" var
+			read -p -r " Copy? (Yy/Nn)" var
 			if [[ $var =~ Y|y ]]; then
 				printf "%s" "\033[F\033[K$printf_var"
 			elif [[ $var =~ N|n ]]; then
@@ -146,19 +146,19 @@ function show_waw()
 {
 	printf "%s\n" "what to backup in $what :"
 	printf "\n"
-	while read LINE; do
-		if [[ -n $LINE ]]; then
-			printf "%s\n" "$LINE"
+	while read -r line; do
+		if [[ -n $line ]]; then
+			printf "%s\n" "$line"
 		fi
-	done < <(cat $what |awk '{print $1}')
+	done < <(awk '{print $1}' < "$where")
 	printf "\n"
 	printf "%s\n" "where to backup in $where :"
 	printf "\n"
-	while read LINE; do
-		if [[ -n $LINE ]]; then
-			printf "%s\n" "$LINE"
+	while read -r line; do
+		if [[ -n $line ]]; then
+			printf "%s\n" "$line"
 		fi
-	done < <(cat $where |awk '{print $1}')
+	done < <(awk '{print $1}' < "$where")
 	exit
 }
 
@@ -194,7 +194,7 @@ function backup()
 			printf "%s\n" "Just Simulation"
 			prompt="y"
 		else
-			read -p "Are you sure to proceed backup? Try argument -t first. (Yy/Nn) : " prompt
+			read -p -r "Are you sure to proceed backup? Try argument -t first. (Yy/Nn) : " prompt
 		fi
 
 
@@ -204,12 +204,12 @@ function backup()
 				fi
 
 				count=0
-				for LINE in $(cat $where |awk '{print $1}'); do
-				if [[ -z $LINE ]]; then
+				for line in $(awk '{print $1}' < "$where"); do
+				if [[ -z $line ]]; then
 					continue
 
 				else
-					where_read="$LINE"
+					where_read="$line"
 						if [[ -e $where_read ]]; then
 							if [[ -d $where_read ]]; then
 								where_read_status[$count]=1 #is dir
@@ -246,13 +246,13 @@ function backup()
 				done
 
 				let count--
-				for LINE in $(cat $what |awk '{print $1}'); do
-				if [[ -z $LINE ]]; then
+				awk '{print $1}' < "$what" | while read -r line; do
+				if [[ -z $line ]]; then
 					continue
 
 				else
 				printf "\n"
-				what_read="$LINE"
+				what_read="$line"
 				where_printout="yes"
 				copy=
 
